@@ -23,18 +23,28 @@ const styles = StyleSheet.create({
     flexBasis: '80asd%',
     marginEnd: 10,
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
 
 export const QRCodeIcon = props => <Icon name="scan1" {...props} />;
 export const GiftIcon = props => <Icon name="tags" size="large" {...props} />;
 
-const ScanInputBar = ({scan}) => {
+const ScanInputBar = ({scan, go}) => {
   const [isCodeEntered, setIsCodeEntered] = useState(false);
   const [coupon, setCoupon] = useState();
 
+  const isValidCode = code => {
+    if (code.length < 10) {
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <Layout
-      style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+    <Layout style={styles.row}>
       <View style={styles.textCode}>
         <Input
           accessoryLeft={GiftIcon}
@@ -42,16 +52,19 @@ const ScanInputBar = ({scan}) => {
           placeholder="Enter coupon code"
           value={coupon}
           onChangeText={text => {
-            if (text) {
-              setCoupon(text);
+            setCoupon(text);
+            if (text && isValidCode(text)) {
               setIsCodeEntered(true);
             } else {
-              setCoupon(text);
               setIsCodeEntered(false);
             }
           }}
         />
-        <Button size="small" style={styles.goBtn}>
+        <Button
+          disabled={!isCodeEntered}
+          size="small"
+          style={styles.goBtn}
+          onPress={() => go(coupon)}>
           Go
         </Button>
       </View>
