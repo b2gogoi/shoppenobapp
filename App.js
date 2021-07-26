@@ -11,7 +11,7 @@ import {ApplicationProvider, IconRegistry, Text} from '@ui-kitten/components';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import { AntDesignIconsPack } from './src/icons/ant-design-icons';
+import {AntDesignIconsPack} from './src/icons/ant-design-icons';
 import {
   SafeAreaView,
   Image,
@@ -110,16 +110,20 @@ export default () => {
 
   return (
     <>
-      <IconRegistry icons={AntDesignIconsPack} />
+      <IconRegistry icons={[AntDesignIconsPack, EvaIconsPack]} />
       <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
+          <Stack.Navigator initialRouteName="MerchantCoupons">
             {/* <Stack.Screen name="Login" component={Dummy} /> */}
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Landing" component={Landing} />
             <Stack.Screen name="Scan" component={Scan} />
             <Stack.Screen name="CouponLoaded" component={CouponLoaded} />
-            <Stack.Screen name="MerchantCoupons" component={MerchantCoupons} />
+            <Stack.Screen
+              name="MerchantCoupons"
+              component={MerchantCoupons}
+              initialParams={{merchantId: 10}}
+            />
             {/* <Stack.Screen name="Details" component={DetailsScreen} />
           <Stack.Screen
             name="Coupons"
