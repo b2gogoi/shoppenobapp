@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {SafeAreaView, View, ScrollView, StyleSheet} from 'react-native';
 import {Layout, Text, Button, Divider} from '@ui-kitten/components';
 
 import ScanInputBar from './components/ScanInputBar';
 import MerchantCard from './components/MerchantCard';
+import {getCouponsSummary} from '../../api/couponService';
+import {sortByCol} from '../../utils';
 
 const styles = StyleSheet.create({
   container: {
@@ -30,11 +32,12 @@ const styles = StyleSheet.create({
 });
 
 const Landing = ({navigation, route}) => {
+  const [coupons, setCoupons] = useState([]);
   const go = code => {
     console.log('Code: ', code);
     navigation.navigate('CouponLoaded', {code});
   };
-  const arry = [
+  /* const arry = [
     {
       name: 'Thirdwave Coffee',
       location: 'HSR Layout',
@@ -48,7 +51,13 @@ const Landing = ({navigation, route}) => {
       offer: 'Deluxe rooms at flat rate of Rs 1000 for August 2021',
       logoUrl: 'https://thesunwaymanor.com/image/Sunwaylogo.png',
     },
-  ];
+  ]; */
+  useEffect(() => {
+    getCouponsSummary().then(data => {
+      console.log('Got data', data);
+      setCoupons(sortByCol(data, 'expiryDate'));
+    });
+  }, []);
   return (
     <SafeAreaView>
       <Layout style={styles.container}>
@@ -58,7 +67,7 @@ const Landing = ({navigation, route}) => {
         <Text style={styles.text}>Your offers:</Text>
 
         <ScrollView style={styles.scrollView}>
-          {arry.map((merchant, i) => (
+          {coupons.map((merchant, i) => (
             <MerchantCard merchant={merchant} key={i} />
           ))}
         </ScrollView>

@@ -7,6 +7,7 @@
  */
 import 'react-native-gesture-handler';
 import React, {useEffect, useState} from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import {ApplicationProvider, IconRegistry, Text} from '@ui-kitten/components';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -108,12 +109,16 @@ export default () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   }; */
 
+  React.useEffect(() => {
+    SplashScreen.hide();
+  });
+
   return (
     <>
       <IconRegistry icons={[AntDesignIconsPack, EvaIconsPack]} />
       <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="MerchantCoupons">
+          <Stack.Navigator initialRouteName="Landing">
             {/* <Stack.Screen name="Login" component={Dummy} /> */}
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Landing" component={Landing} />

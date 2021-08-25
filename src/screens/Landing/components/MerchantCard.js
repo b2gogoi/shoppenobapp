@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, View, StyleSheet} from 'react-native';
 import {Layout, Text, Button, Divider} from '@ui-kitten/components';
+import {format} from '../../../utils';
 
 const styles = StyleSheet.create({
   container: {
@@ -16,34 +17,64 @@ const styles = StyleSheet.create({
   imageContainer: {
     // borderWidth: 1,
     flexBasis: '20%',
+    padding: 8,
   },
   merchantDetails: {
     flexBasis: '80%',
     padding: 8,
+    paddingLeft: 20,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   offer: {
-    height: 50,
-    justifyContent: 'center',
+    // borderWidth: 1,
+    // borderColor: '#AFA7A7',
+    flexDirection: 'row',
+    height: 36,
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   offerText: {
     color: '#AFA7A7',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '400',
     fontStyle: 'italic',
   },
   logo: {
-    resizeMode: 'contain',
-    height: 80,
+    resizeMode: 'cover',
+    height: 60,
+    width: 60,
+    borderWidth: 1,
+    borderColor: '#AFA7A7',
+    borderRadius: 6,
+  },
+  more: {
+    // borderWidth: 1,
+    // borderColor: '#AFA7A7',
+    flexDirection: 'row',
+    height: 14,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: -4,
+  },
+  moreText: {
+    color: '#1DA57F',
+    fontSize: 12,
+    fontWeight: '300',
+    fontStyle: 'italic',
+  },
+  expiresText: {
+    color: '#CE2F2F',
+    fontSize: 10,
+    fontWeight: '300',
   },
 });
 
 const MerchantCard = ({merchant}) => {
-  const {name, location, offer, logoUrl} = merchant;
+  const {name, location, desc, logoUrl, count, expiryDate, merchantId} =
+    merchant;
 
   return (
     <View style={styles.container}>
@@ -65,7 +96,17 @@ const MerchantCard = ({merchant}) => {
           </Text>
         </View>
         <View style={styles.offer}>
-          <Text style={styles.offerText}>{offer}</Text>
+          <Text style={styles.offerText}>{desc}</Text>
+        </View>
+        <View style={styles.more}>
+          <Text category="s2" style={styles.expiresText}>{`Expires: ${format(
+            expiryDate,
+          )}`}</Text>
+          {count > 1 && (
+            <Text category="label" style={styles.moreText} appearance="hint">
+              {`+${count - 1} more coupon${count > 2 ? 's' : ''}`}
+            </Text>
+          )}
         </View>
       </View>
     </View>
