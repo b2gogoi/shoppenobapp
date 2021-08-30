@@ -1,11 +1,29 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, ScrollView, StyleSheet} from 'react-native';
-import {Layout, Text, Button, Divider} from '@ui-kitten/components';
+import {
+  Alert,
+  SafeAreaView,
+  View,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
+import {
+  Modal,
+  Layout,
+  Text,
+  Button,
+  Divider,
+  Spinner,
+} from '@ui-kitten/components';
 
 import ScanInputBar from './components/ScanInputBar';
 import MerchantCard from './components/MerchantCard';
-import {getCouponsSummary} from '../../api/couponService';
+import ActivatedCoupon from './components/ActivatedCoupon';
+import {getCouponsSummary, loadCoupon} from '../../api/couponService';
 import {sortByCol} from '../../utils';
+
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -29,48 +47,127 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 10,
   },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  spinner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: height * 0.5,
+    justifyContent: 'center',
+  },
 });
 
 const Landing = ({navigation, route}) => {
   const [coupons, setCoupons] = useState([]);
-  const go = code => {
-    console.log('Code: ', code);
-    navigation.navigate('CouponLoaded', {code});
-  };
-  /* const arry = [
-    {
-      name: 'Thirdwave Coffee',
-      location: 'HSR Layout',
-      offer: 'Flat 15% off on all orders',
-      logoUrl:
-        'https://cdn.shopify.com/s/files/1/1834/9395/files/TWLOGO_x100@2x.png?v=1620894734',
-    },
-    {
-      name: 'The Sunway Manor Hotel',
-      location: 'Pondicherry',
-      offer: 'Deluxe rooms at flat rate of Rs 1000 for August 2021',
-      logoUrl: 'https://thesunwaymanor.com/image/Sunwaylogo.png',
-    },
-  ]; */
-  useEffect(() => {
+  const [code, setCode] = useState();
+  const [visible, setVisible] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(true);
+  const [isCouponLoading, setIsCouponLoading] = useState(false);
+  const [couponData, setCouponData] = useState();
+
+  const loadOffers = () => {
+    setShowSpinner(true);
     getCouponsSummary().then(data => {
       console.log('Got data', data);
       setCoupons(sortByCol(data, 'expiryDate'));
+      setShowSpinner(false);
+      setCouponData();
     });
+  };
+
+  const clear = () => {
+    setCode('');
+  };
+
+  const showMerchantCoupons = merchantId => {
+    navigation.navigate('MerchantCoupons', {
+      merchantId,
+    });
+  };
+
+  const go = code => {
+    console.log('Code: ', code);
+    // console.log('setIsCouponLoading(false);');
+
+    /*  Alert.alert('Failed to activate code', 'arr', [
+      {
+        text: 'Ok',
+        onPress: () => {
+          console.log('Coupon is loaded');
+          setCode('');
+          setIsCouponLoading(false);
+        },
+        style: 'cancel',
+      },
+    ]); */
+    loadCoupon(code)
+      .then(data => {
+        setCouponData(data);
+        setVisible(true);
+      })
+      .catch(err => {
+        Alert.alert('Failed to activate code', code, [
+          {
+            text: 'Ok',
+            onPress: () => {
+              console.log('Coupon is loaded');
+              setIsCouponLoading(false);
+            },
+            style: 'cancel',
+          },
+        ]);
+      })
+      .finally(() => {
+        clear();
+      });
+  };
+
+  useEffect(() => {
+    loadOffers();
   }, []);
   return (
     <SafeAreaView>
       <Layout style={styles.container}>
-        <ScanInputBar scan={() => navigation.navigate('Scan')} go={go} />
+        <Modal
+          visible={visible}
+          backdropStyle={styles.backdrop}
+          onBackdropPress={() => setVisible(false)}>
+          <ActivatedCoupon
+            data={couponData}
+            cancel={() => {
+              setVisible(false);
+              clear();
+              loadOffers();
+            }}
+          />
+        </Modal>
+        <ScanInputBar
+          scan={() => navigation.navigate('Scan')}
+          go={go}
+          code={code}
+          loading={isCouponLoading}
+        />
         <Divider />
 
         <Text style={styles.text}>Your offers:</Text>
 
-        <ScrollView style={styles.scrollView}>
-          {coupons.map((merchant, i) => (
-            <MerchantCard merchant={merchant} key={i} />
-          ))}
-        </ScrollView>
+        {showSpinner && (
+          <View style={styles.spinner}>
+            <Spinner size="giant" />
+          </View>
+        )}
+        {!showSpinner && (
+          <ScrollView style={styles.scrollView}>
+            {coupons.map(merchant => (
+              <TouchableOpacity
+                key={merchant.merchantId}
+                onPress={e => showMerchantCoupons(merchant.merchantId)}>
+                <MerchantCard merchant={merchant} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
       </Layout>
     </SafeAreaView>
   );

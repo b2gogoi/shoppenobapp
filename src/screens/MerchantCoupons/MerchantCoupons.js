@@ -1,17 +1,28 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Alert,
+  Dimensions,
   SafeAreaView,
   StyleSheet,
   ScrollView,
   View,
   Image,
 } from 'react-native';
-import {Button, Layout, Modal, Card, Text} from '@ui-kitten/components';
+import {
+  Button,
+  Layout,
+  Modal,
+  Card,
+  Text,
+  Spinner,
+} from '@ui-kitten/components';
 import Coupon from './components/Coupon';
 
 import data from '../../data/data';
 import RedeemConfirm from './components/RedeemConfirm';
+import {getMerchantCoupons, redeemCoupon} from '../../api/couponService';
+
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -22,6 +33,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flexBasis: '35%',
+    marginTop: 20,
   },
   merchantDetails: {
     flexBasis: '65%',
@@ -49,18 +61,34 @@ const styles = StyleSheet.create({
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+  spinner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: height * 0.5,
+    justifyContent: 'center',
+  },
 });
-
-const getMerchantCoupons = merchantId => {
-  return data.merchantCoupons[merchantId];
-};
 
 function MerchantCoupons({route, navigation}) {
   const {merchantId} = route.params;
-  const {name, logoUrl, coupons} = getMerchantCoupons(merchantId);
+  // const {name, logoUrl, coupons} = getMerchantCoupons(merchantId);
   const [visible, setVisible] = useState(false);
+  const [name, setName] = useState();
+  const [logoUrl, setLogoUrl] = useState();
   const [coupon, setCoupon] = useState();
-  const [loadedCoupons, setLoadedCoupons] = useState(coupons);
+  const [loadedCoupons, setLoadedCoupons] = useState([]);
+  const [showSpinner, setShowSpinner] = useState(true);
+
+  const loadMerchant = merchantId => {
+    setShowSpinner(true);
+    getMerchantCoupons(merchantId).then(data => {
+      console.log('Got coupons of merchant', data);
+      setShowSpinner(false);
+      setLoadedCoupons(data.coupons);
+      setName(data.name);
+      setLogoUrl(data.logoUrl);
+    });
+  };
 
   const redeemConfirm = selectedCoupon => {
     setCoupon(selectedCoupon);
@@ -68,21 +96,29 @@ function MerchantCoupons({route, navigation}) {
   };
 
   const redeem = coupon => {
-    setTimeout(() => {
-      // error('Coupon already used');
-      setVisible(false);
-      let clone = [...loadedCoupons];
-      let selectedIndex = clone.findIndex(c => c.couponId === coupon.couponId);
-      const updated = {...coupon, status: 'redeemed'};
-      clone.splice(selectedIndex, 1, updated);
-      setLoadedCoupons(clone);
-    }, 1000);
+    redeemCoupon(coupon.code)
+      .then(success => {
+        setVisible(false);
+        console.log('Successfully redeemed coupon', success);
+        loadMerchant(merchantId);
+      })
+      .catch(err => {
+        console.log(err);
+        showError(err);
+      });
   };
 
-  const error = message => {
+  const showError = message => {
     setVisible(false);
     Alert.alert('Redeem Coupon Failed', message);
   };
+
+  useEffect(() => {
+    console.log('Got param merchantId: ', merchantId);
+    if (merchantId) {
+      loadMerchant(merchantId);
+    }
+  }, [merchantId]);
 
   return (
     <SafeAreaView>
@@ -102,30 +138,42 @@ function MerchantCoupons({route, navigation}) {
             />
           )}
         </Modal>
-        <View style={styles.container}>
-          <View style={styles.imageContainer}>
-            <Image
-              style={styles.logo}
-              source={{
-                uri: logoUrl,
-              }}
-            />
+        {showSpinner && (
+          <View style={styles.spinner}>
+            <Spinner size="giant" />
           </View>
-          <View style={styles.merchantDetails}>
-            <Text category="h4" style={styles.merchantHeader} status="primary">
-              {name}
-            </Text>
-          </View>
-        </View>
-        <ScrollView style={styles.scrollView}>
-          {loadedCoupons.map(coupon => (
-            <Coupon
-              data={coupon}
-              key={coupon.couponId}
-              confirm={redeemConfirm}
-            />
-          ))}
-        </ScrollView>
+        )}
+        {!showSpinner && (
+          <>
+            <View style={styles.container}>
+              <View style={styles.imageContainer}>
+                <Image
+                  style={styles.logo}
+                  source={{
+                    uri: logoUrl,
+                  }}
+                />
+              </View>
+              <View style={styles.merchantDetails}>
+                <Text
+                  category="h4"
+                  style={styles.merchantHeader}
+                  status="primary">
+                  {name}
+                </Text>
+              </View>
+            </View>
+            <ScrollView style={styles.scrollView}>
+              {loadedCoupons.map(coupon => (
+                <Coupon
+                  data={coupon}
+                  key={coupon.code}
+                  confirm={redeemConfirm}
+                />
+              ))}
+            </ScrollView>
+          </>
+        )}
       </Layout>
     </SafeAreaView>
   );

@@ -1,6 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Icon, Input, Button, Layout} from '@ui-kitten/components';
+import {
+  Icon,
+  Input,
+  Button,
+  Layout,
+  Spinner,
+} from '@ui-kitten/components';
 
 const styles = StyleSheet.create({
   textCode: {
@@ -32,9 +38,10 @@ const styles = StyleSheet.create({
 export const QRCodeIcon = props => <Icon name="scan1" {...props} />;
 export const GiftIcon = props => <Icon name="tags" size="large" {...props} />;
 
-const ScanInputBar = ({scan, go}) => {
+const ScanInputBar = ({scan, go, loading, code}) => {
   const [isCodeEntered, setIsCodeEntered] = useState(false);
-  const [coupon, setCoupon] = useState();
+  const [isLoading, setIsLoading] = useState(loading);
+  const [coupon, setCoupon] = useState(code);
 
   const isValidCode = code => {
     if (code.length < 10) {
@@ -42,6 +49,19 @@ const ScanInputBar = ({scan, go}) => {
     }
     return true;
   };
+
+  /* useEffect(() => {
+    console.log('loading : ', loading);
+    if (!loading) {
+      setIsLoading(false);
+    }
+  }, [loading]); */
+
+  useEffect(() => {
+    console.log('clear code : ', code);
+    setCoupon(code);
+    setIsLoading(false);
+  }, [code]);
 
   return (
     <Layout style={styles.row}>
@@ -60,13 +80,19 @@ const ScanInputBar = ({scan, go}) => {
             }
           }}
         />
-        <Button
-          disabled={!isCodeEntered}
-          size="small"
-          style={styles.goBtn}
-          onPress={() => go(coupon)}>
-          Go
-        </Button>
+        {!isLoading && (
+          <Button
+            disabled={!isCodeEntered}
+            size="small"
+            style={styles.goBtn}
+            onPress={() => {
+              setIsLoading(true);
+              go(coupon);
+            }}>
+            Go
+          </Button>
+        )}
+        {isLoading && <Spinner size="medium" />}
       </View>
 
       <Button

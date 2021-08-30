@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Linking, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Button, Icon, Text} from '@ui-kitten/components';
+import {format} from '../../../utils';
 
 const styles = StyleSheet.create({
   container: {
@@ -82,12 +83,18 @@ const styles = StyleSheet.create({
   },
   btn: {
     borderRadius: 4,
-    padding: 10,
+    padding: 9,
     width: 130,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   btnText: {
     textTransform: 'uppercase',
     fontWeight: 'bold',
+    fontSize: 12,
   },
   linkText: {
     color: '#0E2560',
@@ -127,8 +134,32 @@ export const LinkIcon = props => (
 export const PhoneIcon = props => <Icon name="phone" size="large" {...props} />;
 
 const Coupon = ({data, confirm}) => {
-  const {code, status, location, offer, online} = data;
-  const [currentStatus, setCurrentStatus] = useState(status);
+  const {
+    code,
+    couponStatus,
+    location,
+    desc,
+    online,
+    phone,
+    whatsapp,
+    conditions,
+    redemptionDate,
+    validityStart,
+    validity,
+    weblink,
+  } = data;
+  const [currentStatus, setCurrentStatus] = useState(couponStatus);
+
+  const isEarly = new Date().getTime() < new Date(validityStart).getTime();
+  let days = 'from tommorrow';
+
+  if (isEarly) {
+    let diff = new Date(validityStart).getTime() - new Date().getTime();
+    let n = Math.ceil(diff / (24 * 60 * 60 * 1000));
+    if (n > 1) {
+      days = `in ${n} days`;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -140,7 +171,7 @@ const Coupon = ({data, confirm}) => {
         </View>
         <View style={styles.location}>
           <Text category="s2" appearance="alternative">
-            {location.name}
+            {location}
           </Text>
           <View style={{flexDirection: 'row', marginTop: -6}}>
             <Button
@@ -148,16 +179,16 @@ const Coupon = ({data, confirm}) => {
               size="tiny"
               accessoryLeft={PhoneIcon}
               appearance="ghost"
-              onPress={() => Linking.openURL(`tel:${location.phone}`)}
+              onPress={() => Linking.openURL(`tel:${phone}`)}
             />
-            {location.whatsapp && (
+            {whatsapp && (
               <Button
                 size="tiny"
                 status="basic"
                 accessoryLeft={WhatsappIcon}
                 appearance="ghost"
                 onPress={() =>
-                  Linking.openURL(`whatsapp://send?phone=${location.whatsapp}`)
+                  Linking.openURL(`whatsapp://send?phone=${whatsapp}`)
                 }
               />
             )}
@@ -165,39 +196,56 @@ const Coupon = ({data, confirm}) => {
         </View>
       </View>
       <View style={styles.offer}>
-        <Text style={styles.offerText}>{offer.text}</Text>
+        <Text style={styles.offerText}>{desc}</Text>
         <View style={styles.offerMicro}>
           <Text category="s2" style={styles.conditionText}>
-            {offer.conditions}
+            {conditions}
           </Text>
           <Text category="s2" style={styles.validityText}>
-            Validity: {offer.validity.from} to {offer.validity.to}
+            Validity:
+            {validity
+              .split(' to ')
+              .map(dt => format(dt))
+              .join(' to ')}
           </Text>
         </View>
       </View>
       <View style={styles.btnRow}>
-        {status === 'active' && (
+        {couponStatus === 'ASSIGNED' && (
           <Button
+            disabled={isEarly ? true : false}
             size="small"
             style={styles.btn}
             accessoryLeft={CheckIcon}
             onPress={() => confirm(data)}>
             <Text appearance="alternative" style={styles.btnText}>
-              Redeem
+              REDEEM
             </Text>
           </Button>
         )}
-        {status === 'expired' && (
+
+        {couponStatus === 'ASSIGNED' && isEarly && (
+          <View style={{paddingTop: 10}}>
+            <Text
+              appearance="hint"
+              status="danger"
+              style={{fontStyle: 'italic', fontWeight: '300'}}>
+              Offer starts {days}
+            </Text>
+          </View>
+        )}
+
+        {couponStatus === 'expired' && (
           <View style={styles.expiredChip}>
             <Text appearance="alternative" style={styles.btnText}>
               Expired
             </Text>
           </View>
         )}
-        {status === 'redeemed' && (
-          <View style={styles.redeemedChip}>
-            <Text appearance="alternative" style={styles.btnText}>
-              Redeemed
+        {couponStatus === 'REDEEMED' && (
+          <View style={{paddingTop: 10}}>
+            <Text appearance="alternative" status="success" category="s1">
+              {couponStatus} on {format(redemptionDate)}
             </Text>
           </View>
         )}
@@ -206,7 +254,7 @@ const Coupon = ({data, confirm}) => {
             size="small"
             appearance="ghost"
             accessoryRight={LinkIcon}
-            onPress={() => Linking.openURL(`${online.url}${code}`)}>
+            onPress={() => Linking.openURL(`${weblink}${code}`)}>
             <Text style={styles.linkText}>Copy code & shop online</Text>
           </Button>
         )}
