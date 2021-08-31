@@ -36,7 +36,8 @@ export const loadCoupon = async code => {
   if (response.ok) {
     return response.json();
   } else {
-    return Promise.reject(response);
+    const errMessage = await response.text();
+    return Promise.reject(errMessage);
   }
 };
 

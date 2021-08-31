@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -79,32 +79,18 @@ const Landing = ({navigation, route}) => {
     });
   };
 
-  const go = code => {
+  const go = useCallback(code => {
     console.log('Code: ', code);
-    // console.log('setIsCouponLoading(false);');
-
-    /*  Alert.alert('Failed to activate code', 'arr', [
-      {
-        text: 'Ok',
-        onPress: () => {
-          console.log('Coupon is loaded');
-          setCode('');
-          setIsCouponLoading(false);
-        },
-        style: 'cancel',
-      },
-    ]); */
     loadCoupon(code)
       .then(data => {
         setCouponData(data);
         setVisible(true);
       })
       .catch(err => {
-        Alert.alert('Failed to activate code', code, [
+        Alert.alert('Coupon activation failed!', err, [
           {
             text: 'Ok',
             onPress: () => {
-              console.log('Coupon is loaded');
               setIsCouponLoading(false);
             },
             style: 'cancel',
@@ -114,11 +100,22 @@ const Landing = ({navigation, route}) => {
       .finally(() => {
         clear();
       });
-  };
+  }, []);
 
   useEffect(() => {
     loadOffers();
   }, []);
+
+  useEffect(() => {
+    if (route.params) {
+      console.log('Got route.params ', route.params);
+      let {scannedCode} = route.params;
+      if (scannedCode) {
+        console.log('Got scanned code: ', scannedCode);
+        go(scannedCode);
+      }
+    }
+  }, [go, route.params]);
   return (
     <SafeAreaView>
       <Layout style={styles.container}>
