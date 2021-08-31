@@ -53,7 +53,15 @@ const styles = StyleSheet.create({
   },
   logo: {
     resizeMode: 'contain',
-    height: '100%',
+    height: 70,
+    // width: 80,
+    // borderRadius: 10,
+    // resizeMode: 'cover',
+    // height: 60,
+    // width: '100%',
+    // borderWidth: 1,
+    // borderColor: '#AFA7A7',
+    borderRadius: 6,
   },
   merchantHeader: {
     color: '#655A5A',

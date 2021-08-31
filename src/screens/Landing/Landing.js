@@ -8,14 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {
-  Modal,
-  Layout,
-  Text,
-  Button,
-  Divider,
-  Spinner,
-} from '@ui-kitten/components';
+import {Modal, Layout, Text, Divider, Spinner} from '@ui-kitten/components';
 
 import ScanInputBar from './components/ScanInputBar';
 import MerchantCard from './components/MerchantCard';

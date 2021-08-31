@@ -5,7 +5,7 @@ import {format} from '../../../utils';
 
 const styles = StyleSheet.create({
   container: {
-    height: 164,
+    height: 168,
     borderWidth: 1,
     borderColor: '#AFA7A7',
     borderRadius: 10,
@@ -31,12 +31,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    height: 28,
+    height: 34,
   },
   code: {
-    flexBasis: '50%',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    flexBasis: '54%',
+    paddingTop: 10,
+    paddingLeft: 10,
+    // borderWidth: 1,
   },
   codeText: {
     color: '#655A5A',
@@ -55,13 +56,16 @@ const styles = StyleSheet.create({
   },
   location: {
     fontWeight: 'bold',
-    flexBasis: '50%',
-    backgroundColor: '#655A5A',
+    flexBasis: '46%',
+    // backgroundColor: '#655A5A',
     borderTopRightRadius: 9,
-    padding: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 2,
+    // borderWidth: 1,
+    // paddingRight: 10,
   },
   offerMicro: {
     paddingVertical: 5,
@@ -96,10 +100,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  iconBtn: {
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 3,
+    width: 14,
+    height: 14,
+    borderRadius: 14,
+  },
   linkText: {
-    color: '#0E2560',
-    fontSize: 12,
-    textDecorationLine: 'underline',
+    fontWeight: '300',
+    // textDecorationLine: 'underline',
   },
   expiredChip: {
     backgroundColor: '#C4C4C4',
@@ -117,6 +130,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  icon: {
+    width: 12,
+    height: 14,
+    color: '#1DA57F',
+  },
+  iconBox: {
+    flexDirection: 'row',
+    width: 56,
+    justifyContent: 'space-between',
+    // borderWidth: 1,
+  },
 });
 
 export const CheckIcon = props => (
@@ -124,14 +148,17 @@ export const CheckIcon = props => (
 );
 
 export const WhatsappIcon = props => (
-  <Icon name="wechat" size="large" {...props} />
+  <Icon name="wechat" size="small" {...props} />
+  // <Icon name="message1" size="small" {...props} />
 );
+
+export const PhoneIcon = props => <Icon name="phone" size="small" {...props} />;
 
 export const LinkIcon = props => (
   <Icon name="external-link-outline" size="small" {...props} pack="eva" />
 );
 
-export const PhoneIcon = props => <Icon name="phone" size="large" {...props} />;
+export const LocationIcon = props => <Icon name="enviromento" {...props} />;
 
 const Coupon = ({data, confirm}) => {
   const {
@@ -139,7 +166,6 @@ const Coupon = ({data, confirm}) => {
     couponStatus,
     location,
     desc,
-    online,
     phone,
     whatsapp,
     conditions,
@@ -170,23 +196,31 @@ const Coupon = ({data, confirm}) => {
           </Text>
         </View>
         <View style={styles.location}>
-          <Text category="s2" appearance="alternative">
-            {location}
-          </Text>
-          <View style={{flexDirection: 'row', marginTop: -6}}>
+          <View style={{flexDirection: 'row', paddingVertical: 4}}>
+            <LocationIcon style={styles.icon} />
+            <Text
+              category="s2"
+              appearance="hint"
+              style={{fontSize: 12, marginLeft: 4}}>
+              {location}
+            </Text>
+          </View>
+          <View style={styles.iconBox}>
             <Button
-              status="basic"
+              status="success"
               size="tiny"
+              style={styles.iconBtn}
               accessoryLeft={PhoneIcon}
-              appearance="ghost"
+              appearance="outline"
               onPress={() => Linking.openURL(`tel:${phone}`)}
             />
             {whatsapp && (
               <Button
                 size="tiny"
-                status="basic"
+                style={styles.iconBtn}
+                status="success"
                 accessoryLeft={WhatsappIcon}
-                appearance="ghost"
+                // appearance="outline"
                 onPress={() =>
                   Linking.openURL(`whatsapp://send?phone=${whatsapp}`)
                 }
@@ -229,7 +263,7 @@ const Coupon = ({data, confirm}) => {
             <Text
               appearance="hint"
               status="danger"
-              style={{fontStyle: 'italic', fontWeight: '300'}}>
+              style={{fontStyle: 'italic', fontWeight: '300', fontSize: 12}}>
               Offer starts {days}
             </Text>
           </View>
@@ -244,18 +278,23 @@ const Coupon = ({data, confirm}) => {
         )}
         {couponStatus === 'REDEEMED' && (
           <View style={{paddingTop: 10}}>
-            <Text appearance="alternative" status="success" category="s1">
+            <Text
+              appearance="alternative"
+              status="success"
+              category="s1"
+              style={{color: '#078767'}}>
               {couponStatus} on {format(redemptionDate)}
             </Text>
           </View>
         )}
-        {online && (
+        {!isEarly && weblink && couponStatus !== 'REDEEMED' && (
           <Button
             size="small"
             appearance="ghost"
             accessoryRight={LinkIcon}
+            style={{width: 184}}
             onPress={() => Linking.openURL(`${weblink}${code}`)}>
-            <Text style={styles.linkText}>Copy code & shop online</Text>
+            Copy code & shop online
           </Button>
         )}
       </View>
