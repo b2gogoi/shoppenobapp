@@ -50,7 +50,7 @@ export default () => {
       <IconRegistry icons={[AntDesignIconsPack, EvaIconsPack]} />
       <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
+          <Stack.Navigator initialRouteName="Login">
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Landing" component={Landing} />
             <Stack.Screen name="Scan" component={Scan} />

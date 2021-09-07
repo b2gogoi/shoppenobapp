@@ -1,9 +1,15 @@
-import React, {useState} from 'react';
-import {ImageBackground, SafeAreaView, StyleSheet, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  Alert,
+  ImageBackground,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {Layout, Text, Button} from '@ui-kitten/components';
 import PhoneInputCard from './components/PhoneInputCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {storeData} from '../../storage/storageService';
+import {getData} from '../../storage/storageService';
+import {verifyOTP} from '../../api/authService';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -17,15 +23,29 @@ const styles = StyleSheet.create({
 
 const Login = ({navigation, route}) => {
   const [state, setState] = useState();
-  const enter = () => {
-    navigation.navigate('Landing');
+  const enter = otp => {
+    console.log('Verifying : OTP: ', otp);
+    verifyOTP(otp)
+      .then(success => {
+        console.log('OTP verified successfully', success.message);
+        navigation.navigate('Landing');
+      })
+      .catch(err => {
+        console.log(err);
+        Alert.alert('OTP verification failed', err);
+      });
   };
 
-  const test = async () => {
-    console.warn('Hello');
+  const inputPhone = async () => {
     setState('phone');
-    await storeData('9686404229');
   };
+
+  useEffect(() => {
+    getData().then(data => {
+      console.warn(data);
+      inputPhone();
+    });
+  }, []);
   return (
     <SafeAreaView
       style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -33,13 +53,13 @@ const Login = ({navigation, route}) => {
         {/* <ImageBackground
           resizeMode="cover"
           style={styles.image}
-          width="300"
-          height="600"
+          // width="300"
+          // height="600"
           source={require('../../../assets/ECX9PP.jpg')}> */}
         <View>
           {state && <PhoneInputCard verify={enter} />}
           {!state && (
-            <Button onPress={test} appearance="outline">
+            <Button onPress={inputPhone} appearance="outline">
               Signup / Login
             </Button>
           )}

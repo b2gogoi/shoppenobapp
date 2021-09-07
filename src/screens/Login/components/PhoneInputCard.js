@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Alert, TextInput, View, StyleSheet} from 'react-native';
-import {Layout, Text, Input, Button} from '@ui-kitten/components';
-import OTPInputView from '@twotalltotems/react-native-otp-input';
+import {Layout, Text, Input, Button, Spinner} from '@ui-kitten/components';
+import OTPTextView from 'react-native-otp-textinput';
+
 import {storeData, getData} from '../../../storage/storageService';
+import {requestOTP} from '../../../api/authService';
 
 const styles = StyleSheet.create({
   borderStyleBase: {
@@ -24,17 +26,64 @@ const styles = StyleSheet.create({
   underlineStyleHighLighted: {
     borderColor: '#03DAC6',
   },
+  otpBtn: {
+    marginVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  textInputContainer: {
+    marginBottom: 40,
+  },
+  textInput: {
+    height: 40,
+    width: '80%',
+    borderColor: '#000',
+    borderWidth: 1,
+    padding: 10,
+    fontSize: 16,
+    letterSpacing: 5,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  roundedTextInput: {
+    borderRadius: 10,
+    borderWidth: 4,
+  },
 });
 
 const PhoneInputCard = ({verify}) => {
   const [phone, setPhone] = useState('init');
   const [otpSent, setOtpSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [otpPin, setOtpPin] = useState('2312');
+  let otpInput = useRef(null);
 
   const validatePhone = text => {
     if (text.length === 10) {
       return true;
     }
     return false;
+  };
+
+  const showError = message => {
+    Alert.alert('OTP generation failed', message);
+  };
+
+  const generate = phoneNumber => {
+    setIsLoading(true);
+    requestOTP(phoneNumber)
+      .then(success => {
+        setOtpSent(true);
+        console.log('OTP sent successfully', success.message);
+        storeData(phone);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setOtpSent(false);
+        console.log(err);
+        showError(err);
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -45,8 +94,8 @@ const PhoneInputCard = ({verify}) => {
   }, []);
 
   return (
-    <>
-      <View>
+    <View>
+      <View style={{marginBottom: 40}}>
         <Input
           placeholder="Enter your mobile number"
           value={phone}
@@ -62,99 +111,60 @@ const PhoneInputCard = ({verify}) => {
           maxLength={10}
           editable={!otpSent}
           disabled={otpSent}
-          size="large "
+          textStyle={{fontSize: 33}}
+          size="large"
           style={{
             height: 40,
-            width: 200,
+            width: 240,
             borderColor: 'gray',
-            borderWidth: 1,
+            // borderWidth: 1,
           }}
         />
-        {/* <TextInput
-          dataDetectorTypes="phoneNumber"
-          
+        {!otpSent && !isLoading && (
+          <View style={styles.otpBtn}>
+            <Button
+              disabled={!phone}
+              color="#f194ff"
+              onPress={() => {
+                generate(phone);
+              }}>
+              Submit
+            </Button>
+          </View>
+        )}
 
-          onChangeText={text => {
-            if (validatePhone(text)) {
-              setPhone(text);
-            } else {
-              setPhone();
-            }
-          }}
-          
-          value={phone}
-          
-          placeholder="Enter your mobile number"
-        /> */}
-        {/* <Button title="Verify" /> */}
-        {!otpSent && (
-          <Button
-            disabled={!phone}
-            color="#f194ff"
-            onPress={() => {
-              setOtpSent(true);
-              storeData(phone);
-            }}>
-            Submit
-          </Button>
+        {isLoading && (
+          <View style={styles.otpBtn}>
+            <Spinner size="medium" />
+          </View>
         )}
       </View>
       {otpSent && (
-        <View>
-          <OTPInputView
-            style={{width: '80%', height: 200}}
-            pinCount={4}
-            code="2213"
-            autoFocusOnLoad={true}
-            // codeInputFieldStyle={styles.borderStyleBase}
-            // codeInputHighlightStyle={styles.borderStyleHighLighted}
-            codeInputFieldStyle={styles.underlineStyleBase}
-            codeInputHighlightStyle={styles.underlineStyleHighLighted}
-            onCodeFilled={code => {
-              console.log(`Code is ${code}, you are good to go!`);
+        <View
+          style={{
+            alignItems: 'center',
+            flexDirection: 'column',
+          }}>
+          <OTPTextView
+            ref={e => (otpInput = e)}
+            containerStyle={styles.textInputContainer}
+            textInputStyle={styles.roundedTextInput}
+            handleTextChange={text => {
+              setOtpPin(text);
             }}
-          />
-          {/* <TextInput
-            style={{
-              height: 40,
-              width: 20,
-              borderColor: 'gray',
-              borderWidth: 1,
-            }}
-            keyboardType="numeric"
-          /> */}
-          {/* <TextInput
-            style={{
-              height: 40,
-              width: 20,
-              borderColor: 'gray',
-              borderWidth: 1,
-            }}
+            inputCount={4}
             keyboardType="numeric"
           />
-          <TextInput
-            style={{
-              height: 40,
-              width: 20,
-              borderColor: 'gray',
-              borderWidth: 1,
-            }}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={{
-              height: 40,
-              width: 20,
-              borderColor: 'gray',
-              borderWidth: 1,
-            }}
-            keyboardType="numeric"
-          /> */}
-
-          <Button onPress={() => verify()}>Verify</Button>
+          <Button
+            size="giant"
+            disabled={otpPin.length < 4}
+            onPress={() => verify(otpPin)}
+            style={{width: 120}}>
+            Verify
+          </Button>
         </View>
       )}
-    </>
+    </View>
   );
 };
 
