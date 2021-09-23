@@ -8,7 +8,8 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {Modal, Layout, Text, Divider, Spinner} from '@ui-kitten/components';
+import {Modal, Layout, Text, Divider} from '@ui-kitten/components';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import ScanInputBar from './components/ScanInputBar';
 import MerchantCard from './components/MerchantCard';
@@ -49,6 +50,9 @@ const styles = StyleSheet.create({
     height: height * 0.5,
     justifyContent: 'center',
   },
+  spinnerTextStyle: {
+    color: '#FFF',
+  },
 });
 
 const Landing = ({navigation, route}) => {
@@ -70,6 +74,8 @@ const Landing = ({navigation, route}) => {
   };
 
   const clear = () => {
+    console.log('clear called');
+    setShowSpinner(false);
     setCode('');
   };
 
@@ -79,25 +85,29 @@ const Landing = ({navigation, route}) => {
     });
   };
 
-  const go = useCallback(code => {
-    console.log('Code: ', code);
-    loadCoupon(code)
+  const go = useCallback(nobcode => {
+    console.log('Code: ', nobcode);
+    setShowSpinner(true);
+    loadCoupon(nobcode)
       .then(data => {
         setCouponData(data);
         setVisible(true);
+        // setIsCouponLoading(false);
       })
       .catch(err => {
-        Alert.alert('Coupon activation failed!', err, [
+        // setIsCouponLoading(false);
+        Alert.alert('NOB activation failed!', err, [
           {
             text: 'Ok',
             onPress: () => {
-              setIsCouponLoading(false);
+              // setIsCouponLoading(false);
             },
             style: 'cancel',
           },
         ]);
       })
       .finally(() => {
+        // setIsCouponLoading(false);
         clear();
       });
   }, []);
@@ -139,25 +149,28 @@ const Landing = ({navigation, route}) => {
           loading={isCouponLoading}
         />
         <Divider />
-
         <Text style={styles.text}>Your offers:</Text>
-
-        {showSpinner && (
+        <Spinner
+          visible={showSpinner}
+          textContent={'Loading...'}
+          textStyle={styles.spinnerTextStyle}
+        />
+        {/* {showSpinner && (
           <View style={styles.spinner}>
             <Spinner size="giant" />
           </View>
-        )}
-        {!showSpinner && (
-          <ScrollView style={styles.scrollView}>
-            {coupons.map(merchant => (
-              <TouchableOpacity
-                key={merchant.merchantId}
-                onPress={e => showMerchantCoupons(merchant.merchantId)}>
-                <MerchantCard merchant={merchant} />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
+        )} */}
+        {/* {!showSpinner && ( */}
+        <ScrollView style={styles.scrollView}>
+          {coupons.map(merchant => (
+            <TouchableOpacity
+              key={merchant.merchantId}
+              onPress={e => showMerchantCoupons(merchant.merchantId)}>
+              <MerchantCard merchant={merchant} />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        {/* )} */}
       </Layout>
     </SafeAreaView>
   );

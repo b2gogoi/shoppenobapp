@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   couponCode: {
-    flexBasis: '80asd%',
+    flexBasis: '80%',
     marginEnd: 10,
   },
   row: {
@@ -38,9 +38,8 @@ const styles = StyleSheet.create({
 export const QRCodeIcon = props => <Icon name="scan1" {...props} />;
 export const GiftIcon = props => <Icon name="tags" size="large" {...props} />;
 
-const ScanInputBar = ({scan, go, loading, code}) => {
+const ScanInputBar = ({scan, go, code}) => {
   const [isCodeEntered, setIsCodeEntered] = useState(false);
-  const [isLoading, setIsLoading] = useState(loading);
   const [coupon, setCoupon] = useState(code);
 
   const isValidCode = code => {
@@ -50,17 +49,13 @@ const ScanInputBar = ({scan, go, loading, code}) => {
     return true;
   };
 
-  /* useEffect(() => {
-    console.log('loading : ', loading);
-    if (!loading) {
-      setIsLoading(false);
-    }
-  }, [loading]); */
-
   useEffect(() => {
-    console.log('clear code : ', code);
-    setCoupon(code);
-    setIsLoading(false);
+    if (code) {
+      setCoupon(code);
+    } else {
+      console.log('clear code : ', code);
+      setCoupon('');
+    }
   }, [code]);
 
   return (
@@ -69,7 +64,7 @@ const ScanInputBar = ({scan, go, loading, code}) => {
         <Input
           accessoryLeft={GiftIcon}
           style={styles.couponCode}
-          placeholder="Enter coupon code"
+          placeholder="Enter NOB code"
           value={coupon}
           onChangeText={text => {
             setCoupon(text);
@@ -80,23 +75,20 @@ const ScanInputBar = ({scan, go, loading, code}) => {
             }
           }}
         />
-        {!isLoading && (
-          <Button
-            disabled={!isCodeEntered}
-            size="small"
-            style={styles.goBtn}
-            onPress={() => {
-              setIsLoading(true);
-              go(coupon);
-            }}>
-            Go
-          </Button>
-        )}
-        {isLoading && <Spinner size="medium" />}
+        <Button
+          disabled={!isCodeEntered}
+          size="small"
+          style={styles.goBtn}
+          onPress={() => {
+            setIsCodeEntered(false);
+            go(coupon);
+          }}>
+          Go
+        </Button>
       </View>
 
       <Button
-        disabled={isCodeEntered}
+        // disabled={isCodeEntered}
         status={isCodeEntered ? 'basic' : 'primary'}
         size="giant"
         style={{height: 60, marginVertical: 10}}

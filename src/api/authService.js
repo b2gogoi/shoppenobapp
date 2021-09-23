@@ -41,7 +41,7 @@ export const verifyOTP = async otp => {
   );
   console.log(response);
   if (response.ok) {
-    return response.statusText;
+    return response.json();
   } else {
     const errMessage = await response.text();
     return Promise.reject(errMessage);

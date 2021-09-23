@@ -42,7 +42,7 @@ const ActivatedCoupon = ({data, cancel}) => {
   return (
     <View style={styles.view}>
       <Text category="s1" status="success">
-        Coupon is loaded successfully
+        NOB is loaded successfully
       </Text>
       <Card>
         <Layout style={styles.layout}>

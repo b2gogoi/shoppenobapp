@@ -43,9 +43,9 @@ const Scan = ({navigation, route}) => {
   return (
     <QRCodeScanner
       onRead={onSuccess}
-      flashMode={RNCamera.Constants.FlashMode.torch}
+      flashMode={RNCamera.Constants.FlashMode.off}
       topContent={
-        <Text style={styles.centerText}>Scan the QR code on your coupon.</Text>
+        <Text style={styles.centerText}>Scan the QR code on your NOB.</Text>
       }
       bottomContent={
         <TouchableOpacity style={styles.buttonTouchable} onPress={cancel}>

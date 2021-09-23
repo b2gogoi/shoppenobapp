@@ -107,7 +107,7 @@ function MerchantCoupons({route, navigation}) {
     redeemCoupon(coupon.code)
       .then(success => {
         setVisible(false);
-        console.log('Successfully redeemed coupon', success);
+        console.log('NOB successfully redeemed', success);
         loadMerchant(merchantId);
       })
       .catch(err => {
@@ -118,7 +118,7 @@ function MerchantCoupons({route, navigation}) {
 
   const showError = message => {
     setVisible(false);
-    Alert.alert('Redeem Coupon Failed', message);
+    Alert.alert('NOB Redemption Failed', message);
   };
 
   useEffect(() => {

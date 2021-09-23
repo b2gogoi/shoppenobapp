@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Alert, TextInput, View, StyleSheet} from 'react-native';
-import {Layout, Text, Input, Button, Spinner} from '@ui-kitten/components';
+import {Alert, View, StyleSheet} from 'react-native';
+import {Input, Button, Spinner} from '@ui-kitten/components';
 import OTPTextView from 'react-native-otp-textinput';
 
 import {storeData, getData} from '../../../storage/storageService';
@@ -49,6 +49,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 4,
   },
+  btn: {
+    width: 150,
+  },
+  phoneContainer: {
+    paddingHorizontal: 20,
+    flex: 1,
+    alignItems: 'center',
+  },
 });
 
 const PhoneInputCard = ({verify}) => {
@@ -79,8 +87,8 @@ const PhoneInputCard = ({verify}) => {
         setIsLoading(false);
       })
       .catch(err => {
+        console.log('Failed to generate OTP', err);
         setOtpSent(false);
-        console.log(err);
         showError(err);
         setIsLoading(false);
       });
@@ -88,16 +96,16 @@ const PhoneInputCard = ({verify}) => {
 
   useEffect(() => {
     getData().then(data => {
-      console.warn(data);
+      console.log(data);
       setPhone(data);
     });
   }, []);
 
   return (
-    <View>
+    <View style={styles.phoneContainer}>
       <View style={{marginBottom: 40}}>
         <Input
-          placeholder="Enter your mobile number"
+          placeholder="Enter mobile"
           value={phone}
           onChangeText={text => {
             // if (validatePhone(text)) {
@@ -111,18 +119,18 @@ const PhoneInputCard = ({verify}) => {
           maxLength={10}
           editable={!otpSent}
           disabled={otpSent}
-          textStyle={{fontSize: 33}}
+          textStyle={{fontSize: 30}}
           size="large"
           style={{
-            height: 40,
-            width: 240,
+            width: 214,
             borderColor: 'gray',
-            // borderWidth: 1,
+            borderWidth: 1,
           }}
         />
         {!otpSent && !isLoading && (
           <View style={styles.otpBtn}>
             <Button
+              style={styles.btn}
               disabled={!phone}
               color="#f194ff"
               onPress={() => {
@@ -159,7 +167,7 @@ const PhoneInputCard = ({verify}) => {
             size="giant"
             disabled={otpPin.length < 4}
             onPress={() => verify(otpPin)}
-            style={{width: 120}}>
+            style={styles.btn}>
             Verify
           </Button>
         </View>

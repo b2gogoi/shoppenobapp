@@ -10,6 +10,14 @@ export const storeData = async value => {
   }
 };
 
+export const clearData = async value => {
+  try {
+    await AsyncStorage.removeItem('phone');
+  } catch (e) {
+    // saving error
+  }
+};
+
 export const getData = async () => {
   try {
     /* const keys = await AsyncStorage.getAllKeys();
@@ -19,7 +27,27 @@ export const getData = async () => {
     if (value !== null) {
       return value;
     }
-    return 'nada';
+    return null;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const storeToken = async value => {
+  try {
+    await AsyncStorage.setItem('token', value);
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getToken = async () => {
+  try {
+    const value = await AsyncStorage.getItem('token');
+    if (value !== null) {
+      return value;
+    }
+    return null;
   } catch (e) {
     throw e;
   }

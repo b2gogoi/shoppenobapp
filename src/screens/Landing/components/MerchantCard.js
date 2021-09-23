@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, View, StyleSheet} from 'react-native';
 import {Layout, Text, Button, Divider} from '@ui-kitten/components';
-import {format} from '../../../utils';
+import {format} from 'date-fns';
 
 const styles = StyleSheet.create({
   container: {
@@ -99,9 +99,9 @@ const MerchantCard = ({merchant}) => {
           <Text style={styles.offerText}>{desc}</Text>
         </View>
         <View style={styles.more}>
-          <Text category="s2" style={styles.expiresText}>{`Expires: ${format(
-            expiryDate,
-          )}`}</Text>
+          <Text category="s2" style={styles.expiresText}>
+            {`Expires: ${format(new Date(expiryDate), 'dd MMM, yyyy')}`}
+          </Text>
           {count > 1 && (
             <Text category="label" style={styles.moreText} appearance="hint">
               {`+${count - 1} more coupon${count > 2 ? 's' : ''}`}

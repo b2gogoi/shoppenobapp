@@ -77,7 +77,7 @@ const RedeemConfirm = props => {
       <Layout style={styles.content}>
         <View>
           <Text category="s1" style={styles.confirmText}>
-            Are you sure you want to redeem this coupon?
+            Are you sure you want to redeem this NOB?
           </Text>
         </View>
         <View style={styles.codeText}>
@@ -86,7 +86,7 @@ const RedeemConfirm = props => {
         <View style={{width: 280}}>
           <Text category="s2" appearance="hint" style={styles.hintText}>
             {isRedeeming
-              ? 'Redeeming coupon ...'
+              ? 'Redeeming NOB ...'
               : 'Please ensure that you made the purchase'}
           </Text>
         </View>

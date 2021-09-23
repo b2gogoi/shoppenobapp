@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Linking, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Button, Icon, Text} from '@ui-kitten/components';
-import {format} from '../../../utils';
+import {format} from 'date-fns';
 
 const styles = StyleSheet.create({
   container: {
@@ -237,10 +237,10 @@ const Coupon = ({data, confirm}) => {
           </Text>
           <Text category="s2" style={styles.validityText}>
             Validity:
-            {validity
+            {` ${validity
               .split(' to ')
-              .map(dt => format(dt))
-              .join(' to ')}
+              .map(dt => format(new Date(dt), 'dd MMM yy'))
+              .join(' to ')}`}
           </Text>
         </View>
       </View>
@@ -283,7 +283,7 @@ const Coupon = ({data, confirm}) => {
               status="success"
               category="s1"
               style={{color: '#078767'}}>
-              {couponStatus} on {format(redemptionDate)}
+              {couponStatus} on {format(new Date(redemptionDate), 'do MMM, yy')}
             </Text>
           </View>
         )}
