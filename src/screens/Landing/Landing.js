@@ -1,14 +1,24 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {
   Alert,
+  Image,
   SafeAreaView,
-  View,
   ScrollView,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import {Modal, Layout, Text, Divider} from '@ui-kitten/components';
+import {
+  Avatar,
+  Modal,
+  Layout,
+  Icon,
+  Text,
+  TopNavigation,
+  TopNavigationAction,
+  Divider,
+} from '@ui-kitten/components';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import ScanInputBar from './components/ScanInputBar';
@@ -53,7 +63,19 @@ const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: '#FFF',
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // backgroundColor: 'green',
+  },
+  logo: {
+    marginHorizontal: 16,
+  },
 });
+
+export const OptionsIcon = props => (
+  <Icon name="options-2-outline" size="small" {...props} pack="eva" />
+);
 
 const Landing = ({navigation, route}) => {
   const [coupons, setCoupons] = useState([]);
@@ -84,6 +106,26 @@ const Landing = ({navigation, route}) => {
       merchantId,
     });
   };
+  // const SettingsIcon = props => <Icon {...props} name="arrow-back" />;
+  const renderTitle = props => (
+    <View style={styles.titleContainer}>
+      {/* <Avatar
+        shape="square"
+        size="giant"
+        style={styles.logo}
+        source={require('../../../assets/nob-logo.png')}
+      /> */}
+      <Image
+        style={{height: 46, width: 66, marginHorizontal: 10}}
+        source={require('../../../assets/nob-logo.png')}
+      />
+      {/* <Text {...props} style={{fontSize: 32}}>
+        ShoppeNOB
+      </Text> */}
+    </View>
+  );
+
+  const renderSettingsAction = () => <TopNavigationAction icon={OptionsIcon} />;
 
   const go = useCallback(nobcode => {
     console.log('Code: ', nobcode);
@@ -128,6 +170,16 @@ const Landing = ({navigation, route}) => {
   }, [go, route.params]);
   return (
     <SafeAreaView>
+      {/* <TopNavigation
+        title={renderTitle}
+        accessoryRight={renderSettingsAction}
+      />
+      <Divider
+        style={{
+          backgroundColor: '#00b29e',
+          // 'linear-gradient(0deg, rgba(53,147,255,1) 0%, rgba(0,178,158,1) 50%, rgba(245,255,3,1) 100%)',
+        }}
+      /> */}
       <Layout style={styles.container}>
         <Modal
           visible={visible}
@@ -148,7 +200,7 @@ const Landing = ({navigation, route}) => {
           code={code}
           loading={isCouponLoading}
         />
-        <Divider />
+        {/* <Divider /> */}
         <Text style={styles.text}>Your offers:</Text>
         <Spinner
           visible={showSpinner}

@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import {Button, Layout} from '@ui-kitten/components';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import PhoneInputCard from './components/PhoneInputCard';
 import {getData, getToken, storeToken} from '../../storage/storageService';
 import {verifyOTP} from '../../api/authService';
