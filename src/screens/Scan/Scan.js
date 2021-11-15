@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
+import {Button, Icon} from '@ui-kitten/components';
 
 const styles = StyleSheet.create({
   centerText: {
@@ -28,7 +29,17 @@ const styles = StyleSheet.create({
   buttonTouchable: {
     padding: 16,
   },
+  icon: {width: 44, height: 44, tintColor: 'grey'},
 });
+
+export const BackIcon = props => (
+  <Icon
+    name="arrow-circle-left-outline"
+    {...props}
+    pack="eva"
+    style={styles.icon}
+  />
+);
 
 const Scan = ({navigation, route}) => {
   const onSuccess = e => {
@@ -49,7 +60,13 @@ const Scan = ({navigation, route}) => {
       }
       bottomContent={
         <TouchableOpacity style={styles.buttonTouchable} onPress={cancel}>
-          <Text style={styles.buttonText}>Back</Text>
+          <Button
+            status={'basic'}
+            size="giant"
+            appearance="ghost"
+            onPress={() => cancel()}
+            accessoryLeft={BackIcon}
+          />
         </TouchableOpacity>
       }
     />

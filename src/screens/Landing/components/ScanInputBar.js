@@ -1,12 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {
-  Icon,
-  Input,
-  Button,
-  Layout,
-  Spinner,
-} from '@ui-kitten/components';
+import {Icon, Input, Button, Layout, Spinner} from '@ui-kitten/components';
 
 const styles = StyleSheet.create({
   textCode: {

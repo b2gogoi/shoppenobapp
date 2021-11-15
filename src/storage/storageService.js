@@ -10,9 +10,11 @@ export const storeData = async value => {
   }
 };
 
-export const clearData = async value => {
+export const clearData = async navigation => {
   try {
     await AsyncStorage.removeItem('phone');
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Login');
   } catch (e) {
     // saving error
   }

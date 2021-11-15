@@ -17,35 +17,25 @@ import * as eva from '@eva-design/eva';
 import {default as theme} from './custom-theme.json';
 
 import {
-  Alert,
   Image,
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
-  Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
 
-import {
-  Avatar,
-  Modal,
-  Layout,
-  Icon,
-  TopNavigation,
-  TopNavigationAction,
-  Divider,
-} from '@ui-kitten/components';
+import {Button, Icon} from '@ui-kitten/components';
 
 import Login from './src/screens/Login/Login';
 import Landing from './src/screens/Landing/Landing';
 import Scan from './src/screens/Scan/Scan';
 import MerchantCoupons from './src/screens/MerchantCoupons/MerchantCoupons';
+import Settings from './src/screens/Settings/Settings';
+import {clearData} from './src/storage/storageService';
 
 const Stack = createStackNavigator();
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 var styles = StyleSheet.create({
   linearGradient: {
@@ -62,37 +52,46 @@ var styles = StyleSheet.create({
     color: '#ffffff',
     backgroundColor: 'transparent',
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width,
+    paddingHorizontal: 10,
+  },
+  logo: {
+    height: 28,
+    width: 37,
+    resizeMode: 'cover',
+  },
+  icon: {width: 22, height: 22, tintColor: '#fff', marginRight: 10},
+  buttonLogout: {
+    // padding: 0,
+    // color: '#FCFACE',
+    // backgroundColor: '#FCFACE',
+  },
 });
 
-export const OptionsIcon = props => (
-  <Icon name="options-2-outline" size="small" {...props} pack="eva" />
+export const SettingsIcon = props => (
+  <Icon name="settings-2-outline" size="small" {...props} pack="eva" />
+);
+
+export const LogoutIcon = props => (
+  <Icon
+    name="log-out-outline"
+    size="small"
+    {...props}
+    pack="eva"
+    // style={{marginLeft: -10}}
+  />
 );
 
 function LogoTitle() {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width,
-        paddingHorizontal: 10,
-        // borderWidth: 1,
-      }}>
-      <Image
-        style={{
-          height: 28,
-          width: 37,
-          // borderWidth: 1,
-          resizeMode: 'cover',
-        }}
-        source={require('./assets/ShoppeNOB.png')}
-      />
-
-      <OptionsIcon fill="white" height="30" width="30" />
+    <View style={styles.headerRow}>
+      <Image style={styles.logo} source={require('./assets/ShoppeNOB.png')} />
     </View>
   );
-  /*  */
 }
 
 export default () => {
@@ -110,40 +109,94 @@ export default () => {
       <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Landing"
+            initialRouteName="Login"
             screenOptions={{
               cardStyle: {backgroundColor: '#fff'},
             }}>
             <Stack.Screen
               name="Login"
               component={Login}
-              screenOptions={{
+              options={{
                 headerShown: false,
               }}
             />
             <Stack.Screen
               name="Landing"
               component={Landing}
-              options={{
+              options={({navigation}) => ({
                 headerStyle: {
                   backgroundColor: '#00b29e',
                 },
                 headerTintColor: '#fff',
                 headerTitle: props => <LogoTitle {...props} />,
+                headerLeft: () => {
+                  return null;
+                },
+                headerRight: () => (
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Settings')}>
+                    <SettingsIcon
+                      fill="white"
+                      height="28"
+                      width="28"
+                      style={{marginRight: 10}}
+                    />
+                  </TouchableOpacity>
+                ),
+              })}
+            />
+            <Stack.Screen
+              name="Scan"
+              component={Scan}
+              options={{
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: '#00b29e',
+                },
+                headerTintColor: '#fff',
+                headerLeft: () => {
+                  return null;
+                },
+                headerTitle: 'Scan',
               }}
             />
-            <Stack.Screen name="Scan" component={Scan} />
             <Stack.Screen
               name="MerchantCoupons"
               component={MerchantCoupons}
-              initialParams={{merchantId: 10}}
+              initialParams={{
+                merchantId: 'd577ee15-70ab-44cd-acc0-46b516e874bf',
+              }}
               options={{
+                headerShown: true,
                 headerStyle: {
                   backgroundColor: '#00b29e',
                 },
                 headerTintColor: '#fff',
-                headerTitle: props => <LogoTitle {...props} />,
+                headerBackTitle: '',
+                headerTitle: '',
               }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={Settings}
+              options={({navigation}) => ({
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: '#00b29e',
+                },
+                headerTintColor: '#fff',
+                headerBackTitle: '',
+                headerRight: () => (
+                  <Button
+                    style={styles.buttonLogout}
+                    onPress={() => clearData(navigation)}
+                    size="large"
+                    status="warning"
+                    appearance="ghost">
+                    Logout
+                  </Button>
+                ),
+              })}
             />
           </Stack.Navigator>
         </NavigationContainer>
