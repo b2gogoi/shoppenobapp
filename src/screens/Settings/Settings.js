@@ -108,14 +108,14 @@ const Settings = () => {
         />
         {settingsData.length > 0 &&
           settingsData.map(setting => (
-            <>
+            <View key={setting.name}>
               <SettingRow
                 style={styles.setting}
                 hint={setting.name}
                 onPress={() => Linking.openURL(setting.url)}
               />
               <Divider />
-            </>
+            </View>
           ))}
       </Layout>
     </SafeAreaView>
